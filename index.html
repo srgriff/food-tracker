@@ -1,0 +1,83 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Nutrition Tracker</title>
+       
+  
+   <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🥗 Nutrition Tracker</div>
+            <ul class="nav-links">
+                <li><a href="./index.html" class="nav-link active" data-page="search">Food Search</a></li>
+                <li><a href="./dashboard.html" class="nav-link" data-page="dashboard">Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+
+    <div class="container">
+        <!-- Page 1: Food Search & Entry -->
+        <div id="search-page" class="page active">
+            <!-- Search Section -->
+            <div class="search-section">
+                <h2>Search Foods</h2>
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Search for a food (e.g., chicken breast)...">
+                    <button id="search-btn">Search</button>
+                </div>
+            </div>
+
+            <!-- Main Grid -->
+            <div class="main-grid">
+                <!-- Search Results -->
+                <div class="search-results">
+                    <h3>Search Results</h3>
+                    <div class="food-list" id="food-list">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔍</div>
+                            <p>Search for foods to see results here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Entries -->
+                <div class="todays-entries">
+                    <h3>Today's Entries</h3>
+                    <div class="entries-list" id="entries-list">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📝</div>
+                            <p>No foods added yet today</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Totals -->
+                <div class="daily-totals">
+                    <h2>Daily Totals</h2>
+                    <div class="totals-grid">
+                        <div class="total-item">
+                            <div class="total-label">Protein</div>
+                            <div class="total-value" id="total-protein">0g</div>
+                            <div class="total-goal">Goal: 150g</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="protein-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="total-item">
+                            <div class="total-label">Fiber</div>
+                            <div class="total-value" id="total-fiber">0g</div>
+                            <div class="total-goal">Goal: 30g</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="fiber-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
