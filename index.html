@@ -1,24 +1,22 @@
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Nutrition Tracker</title>
-       
-  
-   <link rel="stylesheet" href="style.css">
-
-    </head>
-    <body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Search - Nutrition Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
     <!-- Navigation -->
     <nav>
         <div class="nav-container">
             <div class="logo">🥗 Nutrition Tracker</div>
             <ul class="nav-links">
-                <li><a href="index.html" class="nav-link active" data-page="search">Food Search</a></li>
-                <li><a href="dashboard.html" class="nav-link" data-page="dashboard">Dashboard</a></li>
+                <li><a href="./index.html" class="nav-link active">Food Search</a></li>
+                <li><a href="./dashboard.html" class="nav-link">Dashboard</a></li>
             </ul>
         </div>
     </nav>
-
 
     <div class="container">
         <!-- Page 1: Food Search & Entry -->
@@ -27,9 +25,17 @@
             <div class="search-section">
                 <h2>Search Foods</h2>
                 <div class="search-bar">
-                    <input type="text" id="search-input" placeholder="Search for a food (e.g., chicken breast)...">
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Search for a food (e.g., chicken breast)..."
+                        autocomplete="off"
+                    >
                     <button id="search-btn">Search</button>
                 </div>
+                <p style="color: #666; font-size: 0.875rem; margin-top: 0.5rem;">
+                    💡 Tip: Search by food name (e.g., "salmon", "oatmeal", "broccoli")
+                </p>
             </div>
 
             <!-- Main Grid -->
@@ -41,13 +47,24 @@
                         <div class="empty-state">
                             <div class="empty-state-icon">🔍</div>
                             <p>Search for foods to see results here</p>
+                            <p style="font-size: 0.875rem; color: #999; margin-top: 0.5rem;">
+                              <!-- Make sure you've added your USDA API key in app.js  -->
+                            </p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Today's Entries -->
                 <div class="todays-entries">
-                    <h3>Today's Entries</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;">Today's Entries</h3>
+                        <button 
+                            onclick="clearTodaysEntries()" 
+                            style="padding: 0.25rem 0.75rem; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem;"
+                        >
+                            Clear All
+                        </button>
+                    </div>
                     <div class="entries-list" id="entries-list">
                         <div class="empty-state">
                             <div class="empty-state-icon">📝</div>
@@ -80,6 +97,14 @@
                 </div>
             </div>
         </div>
+    </div>
 
-     </div>
-    </div>   
+    <!-- Load the main application script -->
+    <script src="app.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Load the charts script -->
+    <script src="charts.js"></script>
+
+</body>
+</html>

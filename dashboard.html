@@ -1,67 +1,115 @@
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Nutrition Tracker</title>
-       
-  
-   <link rel="stylesheet" href="style.css">
-
-    </head>
-    <body>
-       <nav>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Nutrition Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
         <div class="nav-container">
             <div class="logo">🥗 Nutrition Tracker</div>
             <ul class="nav-links">
-                <li><a href="index.html" class="nav-link active" data-page="search">Food Search</a></li>
-                <li><a href="dashboard.html" class="nav-link" data-page="dashboard">Dashboard</a></li>
+                <li><a href="./index.html" class="nav-link">Food Search</a></li>
+                <li><a href="./dashboard.html" class="nav-link active">Dashboard</a></li>
             </ul>
         </div>
-        </nav>
-    <!-- Page 2: Dashboard -->
-    <div id="dashboard-page" class="page active">
-            <h2 style="margin-bottom: 2rem;">Dashboard & Analytics</h2>
+    </nav>
+
+    <div class="container">
+        <!-- Page 2: Dashboard -->
+        <div id="dashboard-page" class="page active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="margin: 0;">Dashboard & Analytics</h2>
+                <button 
+                    onclick="location.reload()" 
+                    style="padding: 0.5rem 1rem; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;"
+                >
+                    🔄 Refresh Data
+                </button>
+            </div>
             
             <div class="dashboard-grid">
                 <!-- Weekly Trend Chart -->
                 <div class="chart-container">
-                    <h3>Weekly Trends</h3>
-                    <div class="chart-placeholder">
-                        📊 Chart.js visualization will go here
+                    <h3>📈 Weekly Trends</h3>
+                    <p style="color: #666; font-size: 0.875rem; margin-bottom: 1rem;">
+                        Your protein and fiber intake over the last 7 days
+                    </p>
+                    <div class="chart-wrapper">
+                        <canvas id="weeklyTrendChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Stats Cards -->
                 <div class="stat-card">
-                    <div class="stat-label">Tracking Streak</div>
-                    <div class="stat-value">7 days</div>
+                    <div class="stat-label">🔥 Tracking Streak</div>
+                    <div class="stat-value" id="streak-value">0 days</div>
+                    <p style="font-size: 0.875rem; color: #999; margin-top: 0.5rem;">
+                        Consecutive days tracked
+                    </p>
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-label">Avg Daily Protein</div>
-                    <div class="stat-value">142g</div>
+                    <div class="stat-label">💪 Avg Daily Protein</div>
+                    <div class="stat-value" id="avg-protein">0g</div>
+                    <p style="font-size: 0.875rem; color: #999; margin-top: 0.5rem;">
+                        Weekly average
+                    </p>
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-label">Avg Daily Fiber</div>
-                    <div class="stat-value">28g</div>
+                    <div class="stat-label">🌾 Avg Daily Fiber</div>
+                    <div class="stat-value" id="avg-fiber">0g</div>
+                    <p style="font-size: 0.875rem; color: #999; margin-top: 0.5rem;">
+                        Weekly average
+                    </p>
                 </div>
 
-                <!-- Progress Chart -->
+                <!-- Progress Chart (Doughnut) -->
                 <div class="chart-container">
-                    <h3>Goal Progress</h3>
-                    <div class="chart-placeholder">
-                        📈 Progress visualization will go here
+                    <h3>🎯 Today's Goal Progress</h3>
+                    <p style="color: #666; font-size: 0.875rem; margin-bottom: 1rem;">
+                        Percentage of daily goals achieved
+                    </p>
+                    <div class="chart-wrapper">
+                        <canvas id="progressChart"></canvas>
                     </div>
                 </div>
 
-                <!-- Top Foods Chart -->
+                <!-- Top Foods Chart (Pie) -->
                 <div class="chart-container">
-                    <h3>Top Protein Sources</h3>
-                    <div class="chart-placeholder">
-                        🥧 Pie chart will go here
+                    <h3>🥇 Top Protein Sources</h3>
+                    <p style="color: #666; font-size: 0.875rem; margin-bottom: 1rem;">
+                        Your most consumed protein sources
+                    </p>
+                    <div class="chart-wrapper">
+                        <canvas id="topFoodsChart"></canvas>
                     </div>
                 </div>
             </div>
-       </div>
-       </body>
+
+            <!-- Help Section -->
+            <div style="background: #fff; padding: 1.5rem; border-radius: 8px; margin-top: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h3 style="margin-bottom: 1rem;">📊 Understanding Your Data</h3>
+                <ul style="line-height: 2; color: #666;">
+                    <li><strong>Weekly Trends:</strong> Shows your daily protein and fiber intake over the past week</li>
+                    <li><strong>Tracking Streak:</strong> Number of consecutive days you've logged food entries</li>
+                    <li><strong>Today's Progress:</strong> Shows what percentage of your daily goals you've achieved</li>
+                    <li><strong>Top Protein Sources:</strong> Your most frequently logged high-protein foods</li>
+                </ul>
+                <p style="color: #999; font-size: 0.875rem; margin-top: 1rem;">
+                    💡 Tip: Track your meals consistently to see more accurate trends and insights!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load the charts script -->
+    <script src="charts.js"></script>
+</body>
+</html>
