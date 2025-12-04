@@ -2,440 +2,351 @@
 // Handles food search, entries management, and localStorage
 
 // ==================== CONFIGURATION ====================
-const USDA_API_KEY = 'qIMjnrXqfw1Q9vDp2UuPHmM4UYOfhR7JIx5qZT7A'; // 
-const USDA_API_URL = 'https://api.nal.usda.gov/fdc/v1/foods/search';
+// note for later do not lose const USDA_API_KEY = 'qIMjnrXqfw1Q9vDp2UuPHmM4UYOfhR7JIx5qZT7A'; // 
+// note for later do not lose const USDA_API_URL = 'https://api.nal.usda.gov/fdc/v1/foods/search'; //
+// charts.js - Chart.js Integration Module
+// This file handles all chart creation and updates
 
-// Default goals
-const DEFAULT_GOALS = {
-    protein: 150,
-    fiber: 30
-};
-
-// ==================== STATE MANAGEMENT ====================
-let todaysEntries = [];
-let searchResults = [];
-
-// ==================== UTILITY FUNCTIONS ====================
+// Chart instances (stored globally so we can update them)
+let weeklyTrendChart = null;
+let progressChart = null;
+let topFoodsChart = null;
 
 /**
- * Get today's date in YYYY-MM-DD format
+ * Initialize all charts on dashboard page load
  */
-function getTodayDateString() {
-    return new Date().toISOString().split('T')[0];
+function initializeCharts() {
+    createWeeklyTrendChart();
+    createProgressChart();
+    createTopFoodsChart();
+    updateAllCharts();
 }
 
 /**
- * Get user's goals from localStorage
+ * Create the weekly trend line chart
  */
-function getGoals() {
-    const stored = localStorage.getItem('nutrition-goals');
-    return stored ? JSON.parse(stored) : DEFAULT_GOALS;
-}
+function createWeeklyTrendChart() {
+    const ctx = document.getElementById('weeklyTrendChart');
+    if (!ctx) return;
 
-/**
- * Save goals to localStorage
- */
-function saveGoals(goals) {
-    localStorage.setItem('nutrition-goals', JSON.stringify(goals));
-}
-
-/**
- * Load today's entries from localStorage
- */
-function loadTodaysEntries() {
-    const today = getTodayDateString();
-    const stored = localStorage.getItem(`nutrition-${today}`);
-    
-    if (stored) {
-        const data = JSON.parse(stored);
-        todaysEntries = data.entries || [];
-    } else {
-        todaysEntries = [];
-    }
-    
-    renderTodaysEntries();
-    updateDailyTotals();
-}
-
-/**
- * Save today's entries to localStorage
- */
-function saveTodaysEntries() {
-    const today = getTodayDateString();
-    
-    // Calculate totals
-    const totalProtein = todaysEntries.reduce((sum, entry) => sum + (entry.protein || 0), 0);
-    const totalFiber = todaysEntries.reduce((sum, entry) => sum + (entry.fiber || 0), 0);
-    
-    const data = {
-        date: today,
-        entries: todaysEntries,
-        totalProtein: Math.round(totalProtein * 10) / 10,
-        totalFiber: Math.round(totalFiber * 10) / 10,
-        timestamp: new Date().toISOString()
-    };
-    
-    localStorage.setItem(`nutrition-${today}`, JSON.stringify(data));
-}
-
-// ==================== API FUNCTIONS ====================
-
-/**
- * Search for foods using USDA API
- */
-async function searchFoods(query) {
-    if (!query.trim()) {
-        alert('Please enter a search term');
-        return;
-    }
-    
-    // Show loading state
-    const foodList = document.getElementById('food-list');
-    foodList.innerHTML = `
-        <div class="empty-state">
-            <div class="empty-state-icon">⏳</div>
-            <p>Searching...</p>
-        </div>
-    `;
-    
-    try {
-        const response = await fetch(
-            `${USDA_API_URL}?api_key=${USDA_API_KEY}&query=${encodeURIComponent(query)}&pageSize=10`
-        );
-        
-        if (!response.ok) {
-            throw new Error('API request failed');
+    weeklyTrendChart = new Chart(ctx.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [
+                {
+                    label: 'Protein (g)',
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                    borderColor: '#4CAF50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: 'Fiber (g)',
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                    borderColor: '#2196F3',
+                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Grams'
+                    }
+                }
+            }
         }
-        
-        const data = await response.json();
-        searchResults = processFoodData(data.foods || []);
-        renderSearchResults();
-        
-    } catch (error) {
-        console.error('Search error:', error);
-        foodList.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">❌</div>
-                <p>Error searching for foods. Please check your API key and try again.</p>
-            </div>
-        `;
-    }
-}
-
-/**
- * Process raw USDA food data into our format
- */
-function processFoodData(foods) {
-    return foods.map(food => {
-        // Find protein and fiber in nutrients
-        const nutrients = food.foodNutrients || [];
-        const protein = nutrients.find(n => n.nutrientName === 'Protein')?.value || 0;
-        const fiber = nutrients.find(n => 
-            n.nutrientName === 'Fiber, total dietary' || 
-            n.nutrientName === 'Fiber'
-        )?.value || 0;
-        
-        return {
-            id: food.fdcId,
-            name: food.description,
-            protein: Math.round(protein * 10) / 10,
-            fiber: Math.round(fiber * 10) / 10,
-            servingSize: '100g', // USDA data is typically per 100g
-            brandName: food.brandName || food.brandOwner || null
-        };
     });
 }
 
-// ==================== RENDERING FUNCTIONS ====================
-
 /**
- * Render search results
+ * Create the progress doughnut chart
  */
-function renderSearchResults() {
-    const foodList = document.getElementById('food-list');
-    
-    if (searchResults.length === 0) {
-        foodList.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">🔍</div>
-                <p>No results found. Try a different search term.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    foodList.innerHTML = searchResults.map((food, index) => `
-        <div class="food-item" data-index="${index}">
-            <div class="food-header">
-                <div class="food-name">
-                    ${food.name}
-                    ${food.brandName ? `<br><small style="color: #666;">${food.brandName}</small>` : ''}
-                </div>
-            </div>
-            <div class="nutrition-info">
-                <div class="nutrition-item">
-                    <span class="nutrition-label">Protein</span>
-                    <span>${food.protein}g</span>
-                </div>
-                <div class="nutrition-item">
-                    <span class="nutrition-label">Fiber</span>
-                    <span>${food.fiber}g</span>
-                </div>
-                <div class="nutrition-item">
-                    <span class="nutrition-label">Serving</span>
-                    <span>${food.servingSize}</span>
-                </div>
-            </div>
-            <button class="add-btn" onclick="addFoodToToday(${index})">Add to Today</button>
-        </div>
-    `).join('');
+function createProgressChart() {
+    const ctx = document.getElementById('progressChart');
+    if (!ctx) return;
+
+    progressChart = new Chart(ctx.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Protein', 'Fiber'],
+            datasets: [{
+                data: [0, 0],
+                backgroundColor: ['#4CAF50', '#2196F3'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed + '% of goal';
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
 /**
- * Render today's entries
+ * Create the top foods pie chart
  */
-function renderTodaysEntries() {
-    const entriesList = document.getElementById('entries-list');
-    
-    if (todaysEntries.length === 0) {
-        entriesList.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">📝</div>
-                <p>No foods added yet today</p>
-            </div>
-        `;
-        return;
-    }
-    
-    entriesList.innerHTML = todaysEntries.map((entry, index) => `
-        <div class="entry-item">
-            <div class="entry-header">
-                <strong>${entry.name}</strong>
-                <button class="remove-btn" onclick="removeEntry(${index})">Remove</button>
-            </div>
-            <div class="nutrition-info">
-                <div class="nutrition-item">
-                    <span class="nutrition-label">Protein</span>
-                    <span>${entry.protein}g</span>
-                </div>
-                <div class="nutrition-item">
-                    <span class="nutrition-label">Fiber</span>
-                    <span>${entry.fiber}g</span>
-                </div>
-                <div class="nutrition-item">
-                    <span class="nutrition-label">Serving</span>
-                    <span>${entry.servingSize}</span>
-                </div>
-            </div>
-            <small style="color: #999;">Added at ${new Date(entry.timestamp).toLocaleTimeString()}</small>
-        </div>
-    `).join('');
+function createTopFoodsChart() {
+    const ctx = document.getElementById('topFoodsChart');
+    if (!ctx) return;
+
+    topFoodsChart = new Chart(ctx.getContext('2d'), {
+        type: 'pie',
+        data: {
+            labels: ['No data yet'],
+            datasets: [{
+                data: [1],
+                backgroundColor: ['#ccc'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed + 'g';
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
 /**
- * Update daily totals display
+ * Get weekly data from localStorage
+ * Returns last 7 days of data
  */
-function updateDailyTotals() {
-    const goals = getGoals();
-    
-    // Calculate totals
-    const totalProtein = todaysEntries.reduce((sum, entry) => sum + (entry.protein || 0), 0);
-    const totalFiber = todaysEntries.reduce((sum, entry) => sum + (entry.fiber || 0), 0);
-    
-    // Update protein
-    const proteinEl = document.getElementById('total-protein');
-    const proteinProgressEl = document.getElementById('protein-progress');
-    if (proteinEl) {
-        proteinEl.textContent = Math.round(totalProtein) + 'g';
-    }
-    if (proteinProgressEl) {
-        const proteinPercent = Math.min(100, (totalProtein / goals.protein) * 100);
-        proteinProgressEl.style.width = proteinPercent + '%';
-    }
-    
-    // Update fiber
-    const fiberEl = document.getElementById('total-fiber');
-    const fiberProgressEl = document.getElementById('fiber-progress');
-    if (fiberEl) {
-        fiberEl.textContent = Math.round(totalFiber) + 'g';
-    }
-    if (fiberProgressEl) {
-        const fiberPercent = Math.min(100, (totalFiber / goals.fiber) * 100);
-        fiberProgressEl.style.width = fiberPercent + '%';
-    }
-}
-
-// ==================== USER ACTIONS ====================
-
-/**
- * Add a food from search results to today's entries
- */
-function addFoodToToday(index) {
-    const food = searchResults[index];
-    if (!food) return;
-    
-    const entry = {
-        ...food,
-        timestamp: new Date().toISOString(),
-        entryId: Date.now() // Unique ID for this entry
+function getWeeklyData() {
+    const data = {
+        labels: [],
+        protein: [],
+        fiber: []
     };
-    
-    todaysEntries.push(entry);
-    saveTodaysEntries();
-    renderTodaysEntries();
-    updateDailyTotals();
-    
-    // Show success feedback
-    showNotification('Food added successfully! 🎉');
-}
 
-/**
- * Remove an entry from today's list
- */
-function removeEntry(index) {
-    if (confirm('Remove this food from today\'s entries?')) {
-        todaysEntries.splice(index, 1);
-        saveTodaysEntries();
-        renderTodaysEntries();
-        updateDailyTotals();
+    // Get last 7 days
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
         
-        showNotification('Food removed');
-    }
-}
-
-/**
- * Show a temporary notification
- */
-function showNotification(message) {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    notification.style.cssText = `
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        background: #4CAF50;
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 4px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 1000;
-        animation: slideIn 0.3s ease;
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Remove after 3 seconds
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
-
-/**
- * Clear all of today's entries
- */
-function clearTodaysEntries() {
-    if (confirm('Clear all of today\'s entries? This cannot be undone.')) {
-        todaysEntries = [];
-        saveTodaysEntries();
-        renderTodaysEntries();
-        updateDailyTotals();
-        showNotification('Entries cleared');
-    }
-}
-
-// ==================== EVENT LISTENERS ====================
-
-/**
- * Initialize event listeners
- */
-function initializeEventListeners() {
-    // Search button
-    const searchBtn = document.getElementById('search-btn');
-    if (searchBtn) {
-        searchBtn.addEventListener('click', () => {
-            const query = document.getElementById('search-input').value;
-            searchFoods(query);
-        });
-    }
-    
-    // Search on Enter key
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                searchFoods(searchInput.value);
-            }
-        });
-    }
-}
-
-/**
- * Add animation styles
- */
-function addAnimationStyles() {
-    if (!document.getElementById('notification-styles')) {
-        const style = document.createElement('style');
-        style.id = 'notification-styles';
-        style.textContent = `
-            @keyframes slideIn {
-                from {
-                    transform: translateX(400px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-            @keyframes slideOut {
-                from {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateX(400px);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-}
-
-// ==================== INITIALIZATION ====================
-
-/**
- * Initialize the application
- */
-function initializeApp() {
-    console.log('Initializing Food Tracker App...');
-    
-    // Check if we're on the search page
-    if (document.getElementById('search-page')) {
-        loadTodaysEntries();
-        initializeEventListeners();
-        addAnimationStyles();
+        const dateString = date.toISOString().split('T')[0];
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
         
-        // Initialize goals if not set
-        if (!localStorage.getItem('nutrition-goals')) {
-            saveGoals(DEFAULT_GOALS);
+        data.labels.push(dayName);
+        
+        // Get data for this date from localStorage
+        const dayData = localStorage.getItem(`nutrition-${dateString}`);
+        if (dayData) {
+            const parsed = JSON.parse(dayData);
+            data.protein.push(parsed.totalProtein || 0);
+            data.fiber.push(parsed.totalFiber || 0);
+        } else {
+            data.protein.push(0);
+            data.fiber.push(0);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * Get today's progress data
+ */
+function getTodayProgress() {
+    const today = new Date().toISOString().split('T')[0];
+    const dayData = localStorage.getItem(`nutrition-${today}`);
+    
+    const goals = JSON.parse(localStorage.getItem('nutrition-goals') || '{"protein": 150, "fiber": 30}');
+    
+    if (dayData) {
+        const parsed = JSON.parse(dayData);
+        return {
+            proteinPercent: Math.min(100, (parsed.totalProtein / goals.protein * 100).toFixed(1)),
+            fiberPercent: Math.min(100, (parsed.totalFiber / goals.fiber * 100).toFixed(1))
+        };
+    }
+    
+    return { proteinPercent: 0, fiberPercent: 0 };
+}
+
+/**
+ * Get top protein sources from all stored data
+ */
+function getTopProteinSources() {
+    const foodTotals = {};
+    
+    // Iterate through all localStorage keys
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('nutrition-')) {
+            const data = JSON.parse(localStorage.getItem(key));
+            if (data.entries) {
+                data.entries.forEach(entry => {
+                    if (foodTotals[entry.name]) {
+                        foodTotals[entry.name] += entry.protein || 0;
+                    } else {
+                        foodTotals[entry.name] = entry.protein || 0;
+                    }
+                });
+            }
+        }
+    }
+    
+    // Convert to array and sort by protein amount
+    const sorted = Object.entries(foodTotals)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5); // Top 5
+    
+    if (sorted.length === 0) {
+        return { labels: ['No data yet'], data: [1] };
+    }
+    
+    return {
+        labels: sorted.map(item => item[0]),
+        data: sorted.map(item => Math.round(item[1]))
+    };
+}
+
+/**
+ * Calculate statistics for stat cards
+ */
+function calculateStats() {
+    const weeklyData = getWeeklyData();
+    
+    // Calculate averages (excluding zero days)
+    const proteinDays = weeklyData.protein.filter(p => p > 0);
+    const fiberDays = weeklyData.fiber.filter(f => f > 0);
+    
+    const avgProtein = proteinDays.length > 0 
+        ? Math.round(proteinDays.reduce((a, b) => a + b, 0) / proteinDays.length)
+        : 0;
+    
+    const avgFiber = fiberDays.length > 0
+        ? Math.round(fiberDays.reduce((a, b) => a + b, 0) / fiberDays.length)
+        : 0;
+    
+    // Calculate streak
+    let streak = 0;
+    const today = new Date();
+    for (let i = 0; i < 365; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateString = date.toISOString().split('T')[0];
+        const dayData = localStorage.getItem(`nutrition-${dateString}`);
+        
+        if (dayData) {
+            const parsed = JSON.parse(dayData);
+            if (parsed.entries && parsed.entries.length > 0) {
+                streak++;
+            } else {
+                break;
+            }
+        } else {
+            break;
+        }
+    }
+    
+    return { avgProtein, avgFiber, streak };
+}
+
+/**
+ * Update all charts with fresh data from localStorage
+ */
+function updateAllCharts() {
+    // Update weekly trend
+    if (weeklyTrendChart) {
+        const weeklyData = getWeeklyData();
+        weeklyTrendChart.data.labels = weeklyData.labels;
+        weeklyTrendChart.data.datasets[0].data = weeklyData.protein;
+        weeklyTrendChart.data.datasets[1].data = weeklyData.fiber;
+        weeklyTrendChart.update();
+    }
+    
+    // Update progress
+    if (progressChart) {
+        const progress = getTodayProgress();
+        progressChart.data.datasets[0].data = [progress.proteinPercent, progress.fiberPercent];
+        progressChart.update();
+    }
+    
+    // Update top foods
+    if (topFoodsChart) {
+        const topFoods = getTopProteinSources();
+        topFoodsChart.data.labels = topFoods.labels;
+        topFoodsChart.data.datasets[0].data = topFoods.data;
+        
+        // Update colors if we have real data
+        if (topFoods.labels[0] !== 'No data yet') {
+            topFoodsChart.data.datasets[0].backgroundColor = [
+                '#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0'
+            ];
         }
         
-        console.log('Food search page initialized');
+        topFoodsChart.update();
     }
+    
+    // Update stat cards
+    const stats = calculateStats();
+    const streakEl = document.getElementById('streak-value');
+    const avgProteinEl = document.getElementById('avg-protein');
+    const avgFiberEl = document.getElementById('avg-fiber');
+    
+    if (streakEl) streakEl.textContent = stats.streak + ' day' + (stats.streak !== 1 ? 's' : '');
+    if (avgProteinEl) avgProteinEl.textContent = stats.avgProtein + 'g';
+    if (avgFiberEl) avgFiberEl.textContent = stats.avgFiber + 'g';
 }
 
-// Run initialization when DOM is ready
+// Initialize charts when DOM is loaded
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeApp);
+    document.addEventListener('DOMContentLoaded', initializeCharts);
 } else {
-    initializeApp();
+    initializeCharts();
 }
 
-// Make functions globally accessible for onclick handlers
-window.addFoodToToday = addFoodToToday;
-window.removeEntry = removeEntry;
-window.clearTodaysEntries = clearTodaysEntries;
+// Export functions for use in other files
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { updateAllCharts, initializeCharts };
+}
