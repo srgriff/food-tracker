@@ -444,3 +444,9 @@
             font-size: 3rem;
             margin-bottom: 1rem;
         }
+
+        /* Chart wrapper for proper sizing */
+.chart-wrapper {
+    position: relative;
+    height: 300px;
+}
