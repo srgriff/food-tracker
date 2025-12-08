@@ -1,13 +1,12 @@
 // app.js - Main Application Logic
 // Handles food search, entries management, and localStorage
 
-// ==================== CONFIGURATION ====================
 // note for later do not lose const USDA_API_KEY = 'qIMjnrXqfw1Q9vDp2UuPHmM4UYOfhR7JIx5qZT7A'; // 
 // note for later do not lose const USDA_API_URL = 'https://api.nal.usda.gov/fdc/v1/foods/search'; //
 // charts.js - Chart.js Integration Module
-// This file handles all chart creation and updates
+// This file handles all chart creation and updates, make sure titles are correct
 
-// Chart instances (stored globally so we can update them)
+// Chart instances 
 let weeklyTrendChart = null;
 let progressChart = null;
 let topFoodsChart = null;
@@ -82,7 +81,7 @@ function createWeeklyTrendChart() {
 }
 
 /**
- * Create the progress doughnut chart
+ *  progress doughnut chart
  */
 function createProgressChart() {
     const ctx = document.getElementById('progressChart');
@@ -119,7 +118,7 @@ function createProgressChart() {
 }
 
 /**
- * Create the top foods pie chart
+ *  the top foods pie chart
  */
 function createTopFoodsChart() {
     const ctx = document.getElementById('topFoodsChart');
@@ -156,8 +155,8 @@ function createTopFoodsChart() {
 }
 
 /**
- * Get weekly data from localStorage
- * Returns last 7 days of data
+ * Get weekly data 
+ *  last 7 days of data
  */
 function getWeeklyData() {
     const data = {
@@ -218,7 +217,7 @@ function getTodayProgress() {
 function getTopProteinSources() {
     const foodTotals = {};
     
-    // Iterate through all localStorage keys
+   
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith('nutrition-')) {
@@ -238,7 +237,7 @@ function getTopProteinSources() {
     // Convert to array and sort by protein amount
     const sorted = Object.entries(foodTotals)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 5); // Top 5
+        .slice(0, 5); 
     
     if (sorted.length === 0) {
         return { labels: ['No data yet'], data: [1] };

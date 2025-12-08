@@ -15,47 +15,18 @@ Track your daily protein and fiber intake using real food data from the USDA Foo
 - **Data Persistence**: All data saved to localStorage
 - **Responsive Design**: Works on mobile, tablet, and desktop
 
-## 🚀 Setup Instructions
-
-### 1. Get USDA API Key
-1. Visit https://fdc.nal.usda.gov/api-key-signup.html
-2. Sign up (free, no credit card)
-3. Copy your API key from email
-
-### 2. Install API Key
-Open `app.js` and add your key on line 5:
-```javascript
-const USDA_API_KEY = 'your-api-key-here';
 ```
 
-### 3. Run the Project
-**Option A: VS Code Live Server**
-- Install Live Server extension
-- Right-click `index.html` → "Open with Live Server"
-
-**Option B: Python**
-```bash
-python -m http.server 8000
-# Open: http://localhost:8000
-```
 
 ## 📊 Technologies Used
 
-- HTML5, CSS3, JavaScript (ES6+)
+- HTML5, CSS3, JavaScript
 - USDA FoodData Central API
 - Chart.js for data visualization
 - localStorage for data persistence
 - CSS Grid & Flexbox for responsive layout
 
-## 🎓 Capstone Requirements Met
 
-- ✅ Responsive design with media queries (768px, 1024px breakpoints)
-- ✅ API integration (USDA FoodData Central)
-- ✅ 2+ pages (Food Search + Dashboard)
-- ✅ Feature 1: Analyze data in arrays/objects
-- ✅ Feature 2: Visualize data with Chart.js (3 chart types)
-- ✅ Feature 3: Persist data to localStorage
-- ✅ Backup: Calculate tracking streaks using Date object
 
 ## 📁 File Structure
 ```
@@ -78,4 +49,4 @@ food-tracker/
 
 ## 👤 Author
 
-Your Name - Code Louisville 2025 Capstone Project
+Shannon Griffith - Code You Web Dev 2025 Capstone Project

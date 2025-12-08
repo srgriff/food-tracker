@@ -1,5 +1,5 @@
-// app.js - Main Application Logic
-// Handles food search, entries management, and localStorage
+
+// Note:  food search, entries management, and localStorage
 
 // ==================== CONFIGURATION ====================
 const USDA_API_KEY = 'qIMjnrXqfw1Q9vDp2UuPHmM4UYOfhR7JIx5qZT7A'; // 
@@ -11,21 +11,21 @@ const DEFAULT_GOALS = {
     fiber: 30
 };
 
-// ==================== STATE MANAGEMENT ====================
+
 let todaysEntries = [];
 let searchResults = [];
 
-// ==================== UTILITY FUNCTIONS ====================
+
 
 /**
- * Get today's date in YYYY-MM-DD format
+ * today's date in YYYY-MM-DD format
  */
 function getTodayDateString() {
     return new Date().toISOString().split('T')[0];
 }
 
 /**
- * Get  goals from localStorage
+ * goals from localStorage
  */
 function getGoals() {
     const stored = localStorage.getItem('nutrition-goals');
@@ -58,7 +58,7 @@ function loadTodaysEntries() {
 }
 
 /**
- * Save today's entries to localStorage
+ * Save 
  */
 function saveTodaysEntries() {
     const today = getTodayDateString();
@@ -78,7 +78,7 @@ function saveTodaysEntries() {
     localStorage.setItem(`nutrition-${today}`, JSON.stringify(data));
 }
 
-// ==================== API FUNCTIONS ====================
+
 
 /**
  * Search for foods using USDA API
@@ -123,7 +123,7 @@ async function searchFoods(query) {
 }
 
 /**
- * Process raw USDA food data into our format
+ * Process raw data 
  */
 function processFoodData(foods) {
     return foods.map(food => {
@@ -140,13 +140,13 @@ function processFoodData(foods) {
             name: food.description,
             protein: Math.round(protein * 10) / 10,
             fiber: Math.round(fiber * 10) / 10,
-            servingSize: '100g', // USDA data is typically per 100g
+            servingSize: '100g', 
             brandName: food.brandName || food.brandOwner || null
         };
     });
 }
 
-// ==================== RENDERING FUNCTIONS ====================
+
 
 /**
  * Render search results
@@ -192,7 +192,7 @@ function renderSearchResults() {
 }
 
 /**
- * Render today's entries
+ * today's entries
  */
 function renderTodaysEntries() {
     const entriesList = document.getElementById('entries-list');
@@ -265,7 +265,7 @@ function updateDailyTotals() {
     }
 }
 
-// ==================== USER ACTIONS ====================
+
 
 /**
  * Add a food from search results to today's entries
@@ -285,7 +285,7 @@ function addFoodToToday(index) {
     renderTodaysEntries();
     updateDailyTotals();
     
-    // Show success feedback
+    // Show  feedback
     showNotification('Food added successfully! 🎉');
 }
 
@@ -348,9 +348,7 @@ function clearTodaysEntries() {
 
 // ==================== EVENT LISTENERS ====================
 
-/**
- * Initialize event listeners
- */
+
 function initializeEventListeners() {
     // Search button
     const searchBtn = document.getElementById('search-btn');
@@ -405,7 +403,7 @@ function addAnimationStyles() {
     }
 }
 
-// ==================== INITIALIZATION ====================
+
 
 /**
  * Initialize the application
