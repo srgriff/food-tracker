@@ -57,6 +57,11 @@ const USDA_API_KEY = 'your-api-key-here';
 - Install Live Server extension
 - Right-click `index.html` → "Open with Live Server"
 
+### Future goals for this Project
+- Make serving sizes changable
+- Make buttons for most searched items
+- Make a goal editor for fiber/protein goals
+
 
 
 
