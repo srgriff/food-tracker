@@ -43,7 +43,7 @@ food-tracker/
 
 ### 1. Get USDA API Key
 1. Visit https://fdc.nal.usda.gov/api-key-signup.html
-2. Sign up (free! No credit card)
+2. Sign up (free and instant! No credit card and no wait)
 3. Copy your API key from email
 
 ### 2. Install API Key
