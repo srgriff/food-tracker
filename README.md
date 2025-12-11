@@ -75,6 +75,7 @@ const USDA_API_KEY = 'your-api-key-here';
 5. View dashboard - see charts
 
 ***This project is also available on my github page: https://srgriff.github.io/dashboard.html***
+Has been tested via github page on opera(mobile), Edge via github page/live server, Chrome via page/live server
 
 ## 👤 Author
 
