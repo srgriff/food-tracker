@@ -65,6 +65,7 @@ const USDA_API_KEY = 'your-api-key-here';
 
 
 
+
 ##     When Using the Project
 
 1. Search for "chicken" - should see results
@@ -72,6 +73,8 @@ const USDA_API_KEY = 'your-api-key-here';
 3. Check progress bars update
 4. Refresh page - data persists
 5. View dashboard - see charts
+
+***This project is also available on my github page: https://srgriff.github.io/dashboard.html***
 
 ## 👤 Author
 
