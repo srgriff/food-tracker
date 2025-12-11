@@ -39,7 +39,28 @@ food-tracker/
 └── README.md       # Documentation
 ```
 
-## 🧪 Testing
+## 🚀 Setup Instructions
+
+### 1. Get USDA API Key
+1. Visit https://fdc.nal.usda.gov/api-key-signup.html
+2. Sign up (free! No credit card)
+3. Copy your API key from email
+
+### 2. Install API Key
+Open `app.js` and add your key on line 5:
+```javascript
+const USDA_API_KEY = 'your-api-key-here';
+```
+
+### 3. Run the Project
+
+- Install Live Server extension
+- Right-click `index.html` → "Open with Live Server"
+
+
+
+
+##     When Using the Project
 
 1. Search for "chicken" - should see results
 2. Add food - appears in "Today's Entries"

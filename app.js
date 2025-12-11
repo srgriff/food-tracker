@@ -57,6 +57,8 @@ function loadTodaysEntries() {
     updateDailyTotals();
 }
 
+
+
 /**
  * Save 
  */
@@ -437,3 +439,6 @@ if (document.readyState === 'loading') {
 window.addFoodToToday = addFoodToToday;
 window.removeEntry = removeEntry;
 window.clearTodaysEntries = clearTodaysEntries;
+
+
+
